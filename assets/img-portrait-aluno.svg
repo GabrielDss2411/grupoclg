@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="abg" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#15296B"/>
+      <stop offset="1" stop-color="#0A1236"/>
+    </linearGradient>
+    <radialGradient id="aglow" cx="0.3" cy="0.22" r="0.85">
+      <stop offset="0" stop-color="#E9C65A" stop-opacity="0.2"/>
+      <stop offset="0.5" stop-color="#3A56A8" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#3A56A8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="afig" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C407A"/>
+      <stop offset="1" stop-color="#121E4C"/>
+    </linearGradient>
+    <linearGradient id="arim" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#E9C65A" stop-opacity="0.8"/>
+      <stop offset="0.16" stop-color="#E9C65A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="560" fill="url(#abg)"/>
+  <rect width="480" height="560" fill="url(#aglow)"/>
+
+  <circle cx="240" cy="234" r="150" fill="none" stroke="#E9C65A" stroke-opacity="0.12" stroke-width="1.5"/>
+
+  <g>
+    <!-- shoulders -->
+    <path d="M58 560 C62 434 128 376 240 376 C352 376 418 434 422 560 Z" fill="url(#afig)"/>
+    <!-- collar (open, casual) -->
+    <path d="M198 390 L240 468 L282 390 L266 382 L240 436 L214 382 Z" fill="#0D1740"/>
+    <path d="M222 384 L240 448 L258 384 L240 316 Z" fill="#1D2E64"/>
+    <!-- neck -->
+    <rect x="216" y="304" width="48" height="82" rx="22" fill="#274174"/>
+    <!-- head -->
+    <ellipse cx="240" cy="220" rx="80" ry="92" fill="url(#afig)"/>
+    <!-- hair -->
+    <path d="M160 214 C158 154 196 122 240 122 C286 122 322 156 320 214 C318 182 298 156 258 156 C210 156 172 176 160 214 Z" fill="#0D1740"/>
+    <!-- rim light from right -->
+    <rect width="480" height="560" fill="url(#arim)"/>
+  </g>
+</svg>

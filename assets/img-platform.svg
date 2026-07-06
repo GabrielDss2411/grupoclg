@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" preserveAspectRatio="xMidYMid slice" font-family="'Schibsted Grotesk',Segoe UI,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0C1A57"/>
+      <stop offset="1" stop-color="#070E33"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#294296" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#294296" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0D171"/>
+      <stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="380" fill="url(#bg)"/>
+  <rect width="640" height="380" fill="url(#glow)"/>
+
+  <!-- window -->
+  <rect x="40" y="40" width="560" height="300" rx="16" fill="#0E1A45" stroke="#26356F" stroke-width="1"/>
+  <!-- top bar -->
+  <rect x="40" y="40" width="560" height="42" rx="16" fill="#111F4E"/>
+  <rect x="40" y="66" width="560" height="16" fill="#111F4E"/>
+  <circle cx="62" cy="61" r="5" fill="#3A4A82"/>
+  <circle cx="80" cy="61" r="5" fill="#3A4A82"/>
+  <circle cx="98" cy="61" r="5" fill="#3A4A82"/>
+  <rect x="220" y="52" width="200" height="18" rx="9" fill="#1B2A5E"/>
+
+  <!-- sidebar -->
+  <rect x="56" y="98" width="140" height="30" rx="8" fill="#1A2A60"/>
+  <rect x="66" y="108" width="10" height="10" rx="3" fill="url(#gold)"/>
+  <rect x="86" y="109" width="86" height="8" rx="4" fill="#B9C4E6"/>
+  <rect x="56" y="136" width="140" height="26" rx="8" fill="#141F4C"/>
+  <rect x="66" y="145" width="9" height="9" rx="2" fill="#3D4E86"/>
+  <rect x="86" y="145" width="70" height="7" rx="3.5" fill="#4A5893"/>
+  <rect x="56" y="168" width="140" height="26" rx="8" fill="#141F4C"/>
+  <rect x="66" y="177" width="9" height="9" rx="2" fill="#3D4E86"/>
+  <rect x="86" y="177" width="78" height="7" rx="3.5" fill="#4A5893"/>
+  <rect x="56" y="200" width="140" height="26" rx="8" fill="#141F4C"/>
+  <rect x="66" y="209" width="9" height="9" rx="2" fill="#3D4E86"/>
+  <rect x="86" y="209" width="60" height="7" rx="3.5" fill="#4A5893"/>
+
+  <!-- main title -->
+  <rect x="220" y="100" width="150" height="12" rx="6" fill="#E9C65A"/>
+  <rect x="220" y="120" width="250" height="8" rx="4" fill="#3D4E86"/>
+
+  <!-- course rows -->
+  <g>
+    <rect x="220" y="150" width="330" height="52" rx="10" fill="#13214F" stroke="#26356F" stroke-width="1"/>
+    <rect x="232" y="162" width="34" height="28" rx="6" fill="url(#gold)" opacity="0.85"/>
+    <rect x="278" y="164" width="150" height="9" rx="4.5" fill="#C7D0EA"/>
+    <rect x="278" y="180" width="110" height="7" rx="3.5" fill="#465690"/>
+    <rect x="440" y="172" width="98" height="7" rx="3.5" fill="#233363"/>
+    <rect x="440" y="172" width="62" height="7" rx="3.5" fill="url(#gold)"/>
+  </g>
+  <g>
+    <rect x="220" y="214" width="330" height="52" rx="10" fill="#13214F" stroke="#26356F" stroke-width="1"/>
+    <rect x="232" y="226" width="34" height="28" rx="6" fill="#2A3F86"/>
+    <rect x="278" y="228" width="130" height="9" rx="4.5" fill="#C7D0EA"/>
+    <rect x="278" y="244" width="96" height="7" rx="3.5" fill="#465690"/>
+    <rect x="440" y="236" width="98" height="7" rx="3.5" fill="#233363"/>
+    <rect x="440" y="236" width="40" height="7" rx="3.5" fill="url(#gold)"/>
+  </g>
+  <g>
+    <rect x="220" y="278" width="330" height="46" rx="10" fill="#13214F" stroke="#26356F" stroke-width="1"/>
+    <rect x="232" y="288" width="34" height="26" rx="6" fill="#2A3F86"/>
+    <rect x="278" y="292" width="140" height="9" rx="4.5" fill="#C7D0EA"/>
+    <rect x="278" y="307" width="80" height="7" rx="3.5" fill="#465690"/>
+  </g>
+
+  <!-- certificate chip -->
+  <g transform="translate(492,286)">
+    <rect x="0" y="0" width="58" height="30" rx="8" fill="#0A1236" stroke="#C9A227" stroke-width="1"/>
+    <circle cx="16" cy="15" r="8" fill="url(#gold)"/>
+    <path d="M12.5 15 l2.5 2.5 l4.5 -5" stroke="#0A1236" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="30" y="11" width="20" height="8" rx="4" fill="#E9C65A"/>
+  </g>
+</svg>
