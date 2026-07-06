@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 500" preserveAspectRatio="xMidYMid slice" font-family="Arial,Helvetica,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E2A66"/><stop offset="1" stop-color="#0A0E33"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3D889"/><stop offset="1" stop-color="#C9A227"/></linearGradient>
+    <radialGradient id="glow" cx="0.68" cy="0.26" r="0.8"><stop offset="0" stop-color="#E9C65A" stop-opacity="0.2"/><stop offset="1" stop-color="#E9C65A" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="380" height="500" fill="url(#bg)"/>
+  <rect width="380" height="500" fill="url(#glow)"/>
+  <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"><path d="M0 130h380M0 260h380M130 0v500M255 0v500"/></g>
+  <!-- balança grande -->
+  <g transform="translate(190,180)" stroke="url(#gold)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9">
+    <path d="M0 -60 V70"/><path d="M-42 76 H42"/><path d="M-66 -34 H66"/>
+    <path d="M-66 -34 L-90 24 a24 20 0 0 0 48 0 Z"/>
+    <path d="M66 -34 L42 24 a24 20 0 0 0 48 0 Z"/>
+    <circle cx="0" cy="-64" r="6" fill="url(#gold)" stroke="none"/>
+  </g>
+  <text x="34" y="56" font-size="12" font-weight="700" letter-spacing="3" fill="#E9C65A">9ª TURMA · JURÍDICO</text>
+  <text x="34" y="400" font-size="38" font-weight="800" fill="#ffffff">PARECERES</text>
+  <text x="34" y="440" font-size="26" font-weight="800" fill="url(#gold)">QUE SE</text>
+  <text x="34" y="468" font-size="26" font-weight="800" fill="url(#gold)">SUSTENTAM</text>
+  <text x="346" y="56" text-anchor="end" font-size="11" font-weight="700" letter-spacing="1.5" fill="#ffffff" fill-opacity="0.55">GRUPO CLG</text>
+</svg>

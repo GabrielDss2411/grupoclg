@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 500" preserveAspectRatio="xMidYMid slice" font-family="Arial,Helvetica,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#15296B"/><stop offset="1" stop-color="#070E33"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3D889"/><stop offset="1" stop-color="#C9A227"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.24" r="0.8"><stop offset="0" stop-color="#3A56A8" stop-opacity="0.3"/><stop offset="1" stop-color="#3A56A8" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="380" height="500" fill="url(#bg)"/>
+  <rect width="380" height="500" fill="url(#glow)"/>
+  <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"><path d="M0 130h380M0 260h380M130 0v500M255 0v500"/></g>
+  <!-- pessoas / comunidade -->
+  <g transform="translate(190,175)" fill="none" stroke="url(#gold)" stroke-width="7" opacity="0.9">
+    <circle cx="0" cy="-40" r="20"/><path d="M-34 46c0-22 15-38 34-38s34 16 34 38"/>
+    <circle cx="-58" cy="-16" r="15" stroke-opacity="0.55"/><path d="M-84 60c0-18 12-30 26-30" stroke-opacity="0.55"/>
+    <circle cx="58" cy="-16" r="15" stroke-opacity="0.55"/><path d="M84 60c0-18-12-30-26-30" stroke-opacity="0.55"/>
+  </g>
+  <text x="34" y="56" font-size="12" font-weight="700" letter-spacing="3" fill="#E9C65A">WORKSHOP · TERCEIRO SETOR</text>
+  <text x="34" y="404" font-size="52" font-weight="800" fill="url(#gold)">MROSC</text>
+  <text x="34" y="442" font-size="24" font-weight="800" fill="#ffffff">ORGANIZAÇÕES DA</text>
+  <text x="34" y="468" font-size="24" font-weight="800" fill="#ffffff">SOCIEDADE CIVIL</text>
+  <text x="346" y="56" text-anchor="end" font-size="11" font-weight="700" letter-spacing="1.5" fill="#ffffff" fill-opacity="0.55">GRUPO CLG</text>
+</svg>
