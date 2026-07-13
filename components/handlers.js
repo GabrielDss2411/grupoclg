@@ -2,11 +2,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export const ROUTES = { home: '/', cursos: '/cursos', incompany: '/in-company', sobre: '/sobre' };
+export const ROUTES = { home: '/', cursos: '/cursos', congressos: '/congressos', incompany: '/in-company', sobre: '/sobre' };
 
 /**
  * Delegação de eventos para o conteúdo migrado (renderizado via HTML):
- * - [data-nav] => navegação por rota (Next router)
+ * - [data-href] => navegação para caminho literal (páginas de detalhe)
+ * - [data-nav] => navegação por rota nomeada (Next router)
  * - [data-slide] (com sliders:true) => rolagem dos carrosséis
  */
 export function useSiteHandlers(ref, { sliders = false } = {}) {
@@ -17,6 +18,12 @@ export function useSiteHandlers(ref, { sliders = false } = {}) {
     const onClick = (e) => {
       const t = e.target;
       if (!t || !t.closest) return;
+      const link = t.closest('[data-href]');
+      if (link) {
+        e.preventDefault();
+        router.push(link.getAttribute('data-href'));
+        return;
+      }
       const nav = t.closest('[data-nav]');
       if (nav) {
         const r = ROUTES[nav.getAttribute('data-nav')];

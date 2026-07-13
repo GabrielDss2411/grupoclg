@@ -11,9 +11,9 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
-const content = read('lib/content.js');
+const content = read('lib/content.js') + '\n' + read('lib/cursos-data.js') + '\n' + read('lib/congressos-data.js');
 const css = read('app/base.css') + '\n' + read('app/globals.css');
-const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
+const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/cursos/[slug]/page.jsx', 'app/congressos/page.jsx', 'app/congressos/[slug]/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
   .filter((p) => existsSync(join(root, p)));
 const jsx = jsxFiles.map(read).join('\n');
 const handlers = read('components/handlers.js');
@@ -51,7 +51,7 @@ for (const m of all.matchAll(/font-family:\s*([^;"}\\]+)/g)) {
 /* ---------------- 3. Copy: sem travessões ---------------- */
 const dashes = (content.match(/[—–]/g) ?? []).length;
 if (dashes > 0) {
-  errors.push(`${dashes} travessão(ões) (— ou –) em lib/content.js. A copy do site não usa travessões (commit e23dd32).`);
+  errors.push(`${dashes} travessão(ões) (— ou –) em lib/*.js. A copy do site não usa travessões (commit e23dd32).`);
 }
 
 /* ---------------- 4. Seletores responsivos órfãos ---------------- */
@@ -101,12 +101,17 @@ for (const m of all.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) {
 }
 
 /* ---------------- 6. Estrutura ---------------- */
-for (const exp of ['home', 'cursos', 'sobre', 'incompany', 'navbar', 'footer']) {
+for (const exp of ['home', 'cursos', 'congressos', 'sobre', 'incompany', 'navbar', 'footer']) {
   if (!new RegExp(`export const ${exp}\\b`).test(content)) {
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/content.js.`);
   }
 }
-for (const route of ['home', 'cursos', 'incompany', 'sobre']) {
+for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPage']) {
+  if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
+    errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/cursos-data.js / lib/congressos-data.js.`);
+  }
+}
+for (const route of ['home', 'cursos', 'congressos', 'incompany', 'sobre']) {
   if (!new RegExp(`${route}:\\s*'`).test(handlers)) {
     errors.push(`Estrutura quebrada: rota "${route}" não encontrada em ROUTES (components/handlers.js).`);
   }

@@ -48,6 +48,24 @@ a{text-decoration:none}
 ::-webkit-scrollbar{height:8px;width:8px}
 ::-webkit-scrollbar-thumb{background:#DCD8CB;border-radius:8px}
 
+/* Dropdown da navbar (categorias Capacitação / Treinamentos) */
+.nav-drop{position:relative;display:inline-flex}
+.nav-drop-panel{position:absolute;top:100%;left:0;padding-top:10px;z-index:70;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .18s ease, transform .18s ease, visibility .18s}
+.nav-drop:hover>.nav-drop-panel,.nav-drop:focus-within>.nav-drop-panel{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-drop-panel>div{min-width:200px;background:rgba(10,16,40,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:7px;display:flex;flex-direction:column;gap:2px;box-shadow:0 18px 44px -20px rgba(0,0,0,0.6)}
+.nav-drop-panel button{display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;font-size:14.5px;font-weight:500;color:rgba(255,255,255,0.78);padding:10px 13px;border-radius:4px;transition:background-color .16s ease, color .16s ease}
+.nav-drop-panel button:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-drop-caret{transition:transform .18s ease}
+.nav-drop:hover .nav-drop-caret,.nav-drop:focus-within .nav-drop-caret{transform:rotate(180deg)}
+@media (prefers-reduced-motion: reduce){ .nav-drop-panel,.nav-drop-caret{transition:none} }
+
+/* Hovers semânticos do conteúdo portado (detalhe de curso, congressos, LP) */
+[data-hv="gold"]:hover{background:#F0D171 !important}
+[data-hv="navy"]:hover{background:#081142 !important}
+[data-hv="outline"]:hover{border-color:rgba(255,255,255,0.6) !important}
+[data-hv="card"]:hover{box-shadow:0 24px 48px -34px rgba(10,20,66,0.45) !important}
+[data-hv="goldlink"]:hover{color:#F0D171 !important}
+
 /* ============ RESPONSIVO ============ */
 /* Respiro lateral consistente: largura útil um pouco menor => mais margem em qualquer tela (navbar e seções permanecem alinhadas) */
 @media (min-width: 760px){

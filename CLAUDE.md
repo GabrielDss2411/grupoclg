@@ -14,10 +14,12 @@ O script falha se: aparecer cor fora da paleta congelada, fonte fora do stack ap
 
 ## Arquitetura (não mudar sem decisão explícita)
 
-- **Conteúdo em strings HTML**: `lib/content.js` exporta o markup de cada tela (`home`, `cursos`, `sobre`, `incompany`, `navbar`, `footer`) como template strings. Os componentes React (`components/Screen.jsx`, `Navbar.jsx`, `Footer.jsx`) renderizam via `dangerouslySetInnerHTML`.
-- **Rotas reais** (App Router): `/` , `/cursos`, `/in-company`, `/sobre` em `app/*/page.jsx`. Novas páginas = nova rota + novo export em `content.js` + entrada em `ROUTES`.
-- **Interação por delegação de eventos**: `components/handlers.js` (`useSiteHandlers`) trata cliques em `[data-nav]` (navegação via Next router, mapa `ROUTES`) e `[data-slide]` (carrosséis). Não usar handlers inline no markup do content.js.
-- **CSS global**: `app/base.css` (design system + responsivo + estados hover via classes `data-hv`/`nav-active`) e `app/globals.css`. Fontes via `next/font` (`var(--font-inter)`) em `app/layout.jsx`.
+- **Conteúdo em strings HTML**: `lib/content.js` exporta o markup de cada tela (`home`, `cursos`, `congressos`, `sobre`, `incompany`, `navbar`, `footer`) como template strings. Os componentes React (`components/Screen.jsx`, `Navbar.jsx`, `Footer.jsx`) renderizam via `dangerouslySetInnerHTML`.
+- **Rotas reais** (App Router): `/`, `/cursos`, `/congressos`, `/in-company`, `/sobre` + detalhes SSG em `/cursos/[slug]` e `/congressos/[slug]` (`generateStaticParams`). Novas páginas = nova rota + novo export/entrada de dados + entrada em `ROUTES`.
+- **Páginas de detalhe orientadas a dados**: `lib/cursos-data.js` (mapa `CURSOS` + `cursoHtml(slug)`) e `lib/congressos-data.js` (mapa `CONGRESSOS` + `congressoHtml(slug)` + `congressosPage`). O HTML é gerado no build; para adicionar/editar curso ou congresso, mexa só no mapa. Countdown das LPs via `[data-countdown]`, recalculado no cliente em `Screen.jsx`.
+- **Interação por delegação de eventos**: `components/handlers.js` (`useSiteHandlers`) trata cliques em `[data-href]` (caminho literal, ex. cards de detalhe), `[data-nav]` (rota nomeada, mapa `ROUTES`) e `[data-slide]` (carrosséis). Não usar handlers inline no markup.
+- **Menu com categorias (dropdown)**: Home · **Capacitação** (Cursos, Congressos) · **Treinamentos** (In Company) · Sobre. Classes `.nav-drop`/`.nav-drop-panel`/`.nav-drop-caret` em `app/base.css` (hover + `:focus-within`); o destaque ativo usa `data-navkey` + prefixo de rota em `components/Navbar.jsx`.
+- **CSS global**: `app/base.css` (design system + responsivo + hovers: `data-hv="hvN"` legados e semânticos `gold`/`navy`/`outline`/`card`/`goldlink`) e `app/globals.css` (`.nav-active`). Fontes via `next/font` (`var(--font-inter)`) em `app/layout.jsx`.
 - **Animações GSAP**: `lib/animations.js` (reveals por IntersectionObserver, hero, trilha). Respeita `prefers-reduced-motion` — não remover o failsafe.
 - **Assets em `public/assets/`**, referenciados como `/assets/nome.ext`.
 
@@ -70,11 +72,6 @@ Consequência: **alterar um valor inline no content.js pode quebrar silenciosame
 - Toda `<img>` com `alt` descritivo. Respeitar `prefers-reduced-motion` em qualquer animação nova. Não remover outlines de foco.
 - Contato/CTAs de conversão: WhatsApp `wa.me/5521980936347` com mensagem pré-preenchida.
 
-## Pendência: features a portar para o Next.js
+## Conteúdo ilustrativo pendente de dados reais
 
-A migração para Next.js partiu do site **anterior** às features abaixo, que existem prontas no `index.html` do commit `1208a93` (branch `feature/painel-adm`) e precisam ser portadas para `content.js`/rotas:
-
-- Menu dropdown com categorias **Capacitação** (Cursos, Congressos) e **Treinamentos** (In Company).
-- Página **Congressos** (agenda de eventos).
-- Página de **detalhes do curso** (mapa de dados `CURSOS`, 6 cursos, programa em accordion, box de matrícula).
-- **LP por congresso** (mapa de dados `CONGRESSOS`, 4 eventos, countdown, programação por dia).
+Os programas dos cursos (`lib/cursos-data.js`) e, nos congressos (`lib/congressos-data.js`), a programação por dia, os números do evento (painéis/participantes) e os locais ("Centro de Convenções") são **conteúdo ilustrativo**, criados como placeholder. Substituir pelos dados reais quando fornecidos.
