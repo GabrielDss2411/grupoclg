@@ -1,0 +1,17 @@
+/* Reset e base (o runtime original foi removido) */
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #ffffff;
+  color: #0C1A57;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button, input, textarea { font-family: inherit; }
+
+/* Estado ativo da navbar (aplicado por rota) */
+.nav-active { background: rgba(233,198,90,0.16) !important; color: #ffffff !important; }
