@@ -12,6 +12,13 @@ export default function Screen({ html }) {
   useSiteHandlers(ref, { sliders: true });
   useEffect(() => {
     const cleanup = initAnimations();
+    // Countdown das LPs de congresso: calculado no cliente para nunca ficar defasado no SSG.
+    if (ref.current) {
+      ref.current.querySelectorAll('[data-countdown]').forEach((el) => {
+        const dias = Math.ceil((new Date(el.getAttribute('data-countdown') + 'T00:00:00') - Date.now()) / 86400000);
+        el.textContent = dias > 0 ? `Faltam ${dias} dias para o evento` : '';
+      });
+    }
     return () => { if (cleanup) cleanup(); };
   }, [html]);
   return <div ref={ref} dangerouslySetInnerHTML={{ __html: html }} />;
