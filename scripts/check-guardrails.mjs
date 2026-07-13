@@ -11,7 +11,16 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
-const content = read('lib/content.js') + '\n' + read('lib/cursos-data.js') + '\n' + read('lib/congressos-data.js');
+const content =
+  read('lib/content.js') +
+  '\n' +
+  read('lib/cursos-data.js') +
+  '\n' +
+  read('lib/congressos-data.js') +
+  '\n' +
+  read('lib/db.js') +
+  '\n' +
+  read('lib/supabase/server.js');
 const css = read('app/base.css') + '\n' + read('app/globals.css');
 const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/cursos/[slug]/page.jsx', 'app/congressos/page.jsx', 'app/congressos/[slug]/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
   .filter((p) => existsSync(join(root, p)));
