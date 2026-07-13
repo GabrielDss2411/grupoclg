@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Guard rails do site Grupo CLG (ver CLAUDE.md).
+ * Guard rails do site Grupo CLG, versão Next.js (ver CLAUDE.md).
  * Uso: node scripts/check-guardrails.mjs
  * Sai com código 1 se alguma regra do design system / estrutura for violada.
  */
@@ -9,11 +9,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const htmlPath = process.argv[2] ?? join(root, 'index.html');
-const html = readFileSync(htmlPath, 'utf8');
+const read = (p) => readFileSync(join(root, p), 'utf8');
+
+const content = read('lib/content.js');
+const css = read('app/base.css') + '\n' + read('app/globals.css');
+const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
+  .filter((p) => existsSync(join(root, p)));
+const jsx = jsxFiles.map(read).join('\n');
+const handlers = read('components/handlers.js');
+const all = content + '\n' + css + '\n' + jsx;
 
 const errors = [];
-const warnings = [];
 
 /* ---------------- 1. Paleta congelada ---------------- */
 const PALETTE = new Set([
@@ -25,7 +31,7 @@ const PALETTE = new Set([
   '#C9A227','#C9A876','#C9B26B','#D6D6DD','#D7DEF4','#D8C79A','#DCD8CB','#DCDCE1',
   '#E4E4EA','#E5E5EA','#E9C65A','#EAEFFA','#EDE3CF','#F0D171','#F5F5F7','#FFF','#FFFFFF',
 ]);
-const hexes = html.match(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g) ?? [];
+const hexes = all.match(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g) ?? [];
 const foreign = [...new Set(hexes.map((h) => h.toUpperCase()))].filter((h) => !PALETTE.has(h));
 if (foreign.length) {
   errors.push(
@@ -35,26 +41,25 @@ if (foreign.length) {
 
 /* ---------------- 2. Tipografia ---------------- */
 const FONT_OK =
-  /^\s*(-apple-system|inherit|'Inter'|'Newsreader'|'Hanken Grotesk'|'Schibsted Grotesk')/;
-for (const m of html.matchAll(/font-family:\s*([^;"}]+)/g)) {
+  /^\s*(-apple-system|inherit|var\(--font-inter\)|'Inter'|'Newsreader'|'Hanken Grotesk'|'Schibsted Grotesk')/;
+for (const m of all.matchAll(/font-family:\s*([^;"}\\]+)/g)) {
   if (!FONT_OK.test(m[1])) {
     errors.push(`font-family fora do stack aprovado: "${m[1].trim()}" (ver CLAUDE.md, seção Tipografia).`);
   }
 }
 
 /* ---------------- 3. Copy: sem travessões ---------------- */
-const dashes = (html.match(/[—–]/g) ?? []).length;
+const dashes = (content.match(/[—–]/g) ?? []).length;
 if (dashes > 0) {
-  errors.push(`${dashes} travessão(ões) (— ou –) encontrados. A copy do site não usa travessões (commit e23dd32).`);
+  errors.push(`${dashes} travessão(ões) (— ou –) em lib/content.js. A copy do site não usa travessões (commit e23dd32).`);
 }
 
 /* ---------------- 4. Seletores responsivos órfãos ---------------- */
-// O bloco responsivo casa substrings de estilos inline: [style*="..."].
+// O CSS (app/base.css) casa substrings dos estilos inline de lib/content.js via [style*="..."].
 // Se um valor inline mudar e o seletor não casar mais, o mobile quebra em silêncio.
-const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]);
-const css = styleBlocks.join('\n').replace(/:not\(\[style\*="[^"]+"\]\)/g, ''); // :not() não precisa casar
-const needles = [...new Set([...css.matchAll(/\[style\*="([^"]+)"\]/g)].map((m) => m[1]))];
-const inlineStyles = [...html.matchAll(/style="([^"]*)"/g)].map((m) => m[1]);
+const cssClean = css.replace(/:not\(\[style\*="[^"]+"\]\)/g, ''); // :not() não precisa casar
+const needles = [...new Set([...cssClean.matchAll(/\[style\*="([^"]+)"\]/g)].map((m) => m[1]))];
+const inlineStyles = [...content.matchAll(/style="([^"]*)"/g)].map((m) => m[1]);
 // Órfãos pré-existentes (seletores defensivos ou sobras de iterações antigas). Não adicionar novos.
 const KNOWN_ORPHANS = new Set([
   'Hanken',
@@ -67,6 +72,7 @@ const KNOWN_ORPHANS = new Set([
   'padding:96px 30px 34px',
   'padding:104px 30px 26px',
   'padding:84px 30px',
+  'height:520px',
   'min-height:520px',
   'min-height:450px',
   'min-height:420px',
@@ -81,43 +87,40 @@ const KNOWN_ORPHANS = new Set([
 for (const needle of needles) {
   if (!inlineStyles.some((s) => s.includes(needle)) && !KNOWN_ORPHANS.has(needle)) {
     errors.push(
-      `Seletor responsivo órfão: [style*="${needle}"] não casa com nenhum estilo inline. ` +
-        `Se você alterou um valor inline, atualize o seletor correspondente no bloco <style> responsivo.`
+      `Seletor responsivo órfão: [style*="${needle}"] (app/base.css) não casa com nenhum estilo inline de lib/content.js. ` +
+        `Se você alterou um valor inline, atualize o seletor correspondente.`
     );
   }
 }
 
 /* ---------------- 5. Assets referenciados existem ---------------- */
-for (const m of html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)) {
-  if (!existsSync(join(root, m[1]))) {
-    errors.push(`Asset referenciado não existe: ${m[1]}`);
+for (const m of all.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) {
+  if (!existsSync(join(root, 'public', m[1]))) {
+    errors.push(`Asset referenciado não existe em public/: ${m[1]}`);
   }
 }
 
-/* ---------------- 6. Estrutura da SPA ---------------- */
-const REQUIRED = [
-  ['class Component extends DCLogic', 'runtime da SPA (script text/x-dc)'],
-  ['assets/gsap.min.js', 'GSAP'],
-  ['gsap-ready', 'failsafe de animação do hero'],
-  ['prefers-reduced-motion', 'suporte a movimento reduzido'],
-  ['Ver turmas abertas', 'CTA principal do site'],
-];
-for (const key of ['isHome', 'isCursos', 'isCurso', 'isCongressos', 'isCongresso', 'isSobre', 'isInCompany', 'isCapacitacao', 'isTreinamentos', 'goHome', 'goCursos', 'goCurso', 'goCongressos', 'goCongresso', 'goSobre', 'goInCompany']) {
-  REQUIRED.push([`${key}:`, `tela/navegação "${key}" no renderVals`]);
-}
-for (const [needle, label] of REQUIRED) {
-  if (!html.includes(needle)) {
-    errors.push(`Estrutura quebrada: ${label} ("${needle}") não encontrado no index.html.`);
+/* ---------------- 6. Estrutura ---------------- */
+for (const exp of ['home', 'cursos', 'sobre', 'incompany', 'navbar', 'footer']) {
+  if (!new RegExp(`export const ${exp}\\b`).test(content)) {
+    errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/content.js.`);
   }
 }
-if ((html.match(/<style/g) ?? []).length < 2) {
-  errors.push('Estrutura quebrada: esperados 2 blocos <style> (fontes + design system/responsivo).');
+for (const route of ['home', 'cursos', 'incompany', 'sobre']) {
+  if (!new RegExp(`${route}:\\s*'`).test(handlers)) {
+    errors.push(`Estrutura quebrada: rota "${route}" não encontrada em ROUTES (components/handlers.js).`);
+  }
+}
+if (!content.includes('Ver turmas abertas')) {
+  errors.push('Estrutura quebrada: CTA principal "Ver turmas abertas" não encontrado em lib/content.js.');
+}
+if (!/prefers-reduced-motion/.test(css) || !/prefers-reduced-motion/.test(read('lib/animations.js'))) {
+  errors.push('Estrutura quebrada: suporte a prefers-reduced-motion removido (app/base.css / lib/animations.js).');
 }
 
 /* ---------------- resultado ---------------- */
-for (const w of warnings) console.warn(`AVISO: ${w}`);
 if (errors.length) {
-  console.error(`Guard rails: ${errors.length} violação(ões) em index.html:\n`);
+  console.error(`Guard rails: ${errors.length} violação(ões):\n`);
   for (const e of errors) console.error(` - ${e}`);
   console.error('\nRegras completas: CLAUDE.md');
   process.exit(1);

@@ -1,37 +1,37 @@
 # Grupo CLG — Site institucional
 
-Site estático de página única (`index.html`, ~1.700 linhas) + `assets/`. Sem build, sem framework, sem package.json. Deploy na Vercel como estático (`vercel.json`).
+Site em **Next.js (App Router, SSG)**, migrado do estático original preservando o markup e o design system. Deploy na Vercel.
 
 ## Guard rails — verificação obrigatória
 
-Após qualquer edição no `index.html`, rode:
+Após qualquer edição em `lib/`, `app/` ou `components/`, rode:
 
 ```
 node scripts/check-guardrails.mjs
 ```
 
-O script falha se: aparecer cor fora da paleta congelada, fonte fora do stack aprovado, travessão (—/–) no copy, seletor responsivo `[style*="..."]` órfão, asset referenciado que não existe, ou se a estrutura de telas/scripts for quebrada. Um hook em `.claude/settings.json` roda esse check automaticamente após edições no `index.html`.
+O script falha se: aparecer cor fora da paleta congelada, fonte fora do stack aprovado, travessão (—/–) na copy, seletor responsivo `[style*="..."]` órfão, asset referenciado que não existe em `public/`, ou se a estrutura (exports do content, rotas, CTA, reduced-motion) for quebrada. Um hook em `.claude/settings.json` roda esse check automaticamente após edições nesses diretórios.
 
 ## Arquitetura (não mudar sem decisão explícita)
 
-- **SPA de arquivo único.** As 7 "páginas" são telas alternadas por estado, não arquivos: `home`, `cursos`, `curso` (detalhe), `congressos`, `congresso` (LP), `sobre`, `incompany`.
-- **Runtime próprio** (exportado de ferramenta de design): classe `Component extends DCLogic` no `<script type="text/x-dc">`; bindings `{{ ... }}`; condicionais `<sc-if value="{{ isCursos }}">`; navegação via `goHome/goCursos/goCurso/goCongressos/goCongresso/goSobre/goInCompany` → `this.nav(tela)`. Não renomear essas chaves — a navbar, o footer e os CTAs dependem delas.
-- **Telas de detalhe (curso e congresso/LP)**: uma tela única por tipo, preenchida por script vanilla a partir de um mapa de dados (`CURSOS` no script "DETALHE DO CURSO", `CONGRESSOS` no script "LP DO CONGRESSO", ambos no fim do arquivo). O clique num card com `data-curso="slug"`/`data-congresso="slug"` grava `window.__cursoAtual`/`window.__congressoAtual` (listener em fase de captura) e navega via `{{ goCurso }}`/`{{ goCongresso }}`; um MutationObserver preenche os campos `data-cd-*`/`data-lp-*` quando a tela renderiza. Para adicionar curso/congresso: entrada no mapa + card com o slug. O HTML da tela traz o primeiro item como conteúdo default.
-- **Menu com categorias (dropdown)**: Home · **Capacitação** (Cursos, Congressos) · **Treinamentos** (In Company) · Sobre. Implementado com as classes `.nav-drop`/`.nav-drop-panel`/`.nav-drop-caret` no segundo bloco `<style>` (hover + `:focus-within`). O clique no título da categoria leva à primeira tela dela; o destaque ativo usa `isCapacitacao`/`isTreinamentos` no `renderVals`. Nova tela em categoria = novo botão no painel + flag `is*`/`go*` no runtime + entrada no footer.
-- **Dois blocos `<style>`**: o primeiro é @font-face (fontes locais em `assets/*.woff2`); o segundo é o design system + responsivo. Todo o resto do estilo é **inline** (`style="..."`).
-- **GSAP** (`assets/gsap.min.js`) anima o hero/seções. `html.gsap-ready` esconde o hero até a animação assumir; há failsafe que remove a classe se GSAP faltar ou se `prefers-reduced-motion`. Não remover o failsafe.
+- **Conteúdo em strings HTML**: `lib/content.js` exporta o markup de cada tela (`home`, `cursos`, `sobre`, `incompany`, `navbar`, `footer`) como template strings. Os componentes React (`components/Screen.jsx`, `Navbar.jsx`, `Footer.jsx`) renderizam via `dangerouslySetInnerHTML`.
+- **Rotas reais** (App Router): `/` , `/cursos`, `/in-company`, `/sobre` em `app/*/page.jsx`. Novas páginas = nova rota + novo export em `content.js` + entrada em `ROUTES`.
+- **Interação por delegação de eventos**: `components/handlers.js` (`useSiteHandlers`) trata cliques em `[data-nav]` (navegação via Next router, mapa `ROUTES`) e `[data-slide]` (carrosséis). Não usar handlers inline no markup do content.js.
+- **CSS global**: `app/base.css` (design system + responsivo + estados hover via classes `data-hv`/`nav-active`) e `app/globals.css`. Fontes via `next/font` (`var(--font-inter)`) em `app/layout.jsx`.
+- **Animações GSAP**: `lib/animations.js` (reveals por IntersectionObserver, hero, trilha). Respeita `prefers-reduced-motion` — não remover o failsafe.
+- **Assets em `public/assets/`**, referenciados como `/assets/nome.ext`.
 
 ## ⚠️ Acoplamento frágil: responsivo via `[style*="..."]`
 
-O bloco responsivo funciona casando **substrings literais dos estilos inline**, ex.:
+O `app/base.css` faz o responsivo casando **substrings literais dos estilos inline** que estão nas strings de `lib/content.js`, ex.:
 
 ```css
 @media (max-width: 720px){ [style*="padding:64px 58px"]{padding:34px 24px !important} }
 ```
 
-Consequência: **alterar um valor inline pode quebrar silenciosamente o mobile.** Regras:
+Consequência: **alterar um valor inline no content.js pode quebrar silenciosamente o mobile.** Regras:
 
-1. Antes de mudar qualquer valor inline de `max-width`, `padding`, `font-size`, `min-height`, `grid-template-columns` ou `flex`, procure o valor antigo no segundo bloco `<style>`. Se houver seletor casando, atualize o seletor junto (ou mantenha o valor).
+1. Antes de mudar qualquer valor inline de `max-width`, `padding`, `font-size`, `min-height`, `grid-template-columns` ou `flex`, procure o valor antigo em `app/base.css`. Se houver seletor casando, atualize o seletor junto (ou mantenha o valor).
 2. Ao criar seção nova, reutilize valores já cobertos pelo responsivo (ex.: container `max-width:1200px`, padding de seção `104px 30px`) em vez de inventar valores novos.
 3. O check de guard rails acusa seletores `[style*=...]` que não casam com nada ("órfãos").
 
@@ -52,26 +52,29 @@ Consequência: **alterar um valor inline pode quebrar silenciosamente o mobile.*
 
 ### Tipografia
 
-- Stack único: `-apple-system, system-ui, BlinkMacSystemFont,'Inter','Segoe UI',Roboto, sans-serif`. Headings `font-weight:600` com `letter-spacing:-0.022em` (estilo Apple).
-- Fontes da exportação original (Newsreader/Hanken Grotesk/Schibsted Grotesk) são **neutralizadas por CSS** — podem existir em inline antigo, mas **não usar em código novo** e não adicionar família nova.
-- Mobile: h1 33px / h2 27px / h3 18.5px (já tratado no bloco responsivo).
+- Stack único: Inter via `next/font` (`var(--font-inter)`) com fallback ao stack Apple (`-apple-system, system-ui, ...`). Headings `font-weight:600` com `letter-spacing:-0.022em`.
+- Fontes da exportação original (Newsreader/Hanken Grotesk/Schibsted Grotesk) podem existir em markup antigo, mas **não usar em código novo** e não adicionar família nova.
 
 ### Componentes
 
-- **Botões**: sempre pill (`border-radius:999px`). Primário = amarelo `#E9C65A` → hover `#F0D171`, texto `#0A1442`, `font-weight:700`. Secundário = navy `#0C1A57` → hover `#081142`, texto branco. Press-state global `scale(0.96)`.
-- **CTA único**: o CTA principal do site é **"Ver turmas abertas"** (→ `goCursos`). Não criar CTAs primários concorrentes; secundário permitido: "Ver treinamentos In Company".
-- **Cantos**: o CSS força radius 16–30px para **5px** (cantos crispos) em elementos com estilo inline. Em código novo, usar diretamente: `5px` (cards/imagens), `8–14px` (elementos menores), `999px` (pills), `50%` (avatares).
+- **Botões**: sempre pill (`border-radius:999px`). Primário = amarelo `#E9C65A` → hover `#F0D171`, texto `#0A1442`, `font-weight:700`. Secundário = navy `#0C1A57` → hover `#081142`, texto branco.
+- **CTA único**: o CTA principal do site é **"Ver turmas abertas"** (`data-nav="cursos"`). Não criar CTAs primários concorrentes; secundário permitido: "Ver treinamentos In Company".
+- **Cantos**: o CSS força radius 16–30px para **5px** (cantos crispos). Em código novo, usar diretamente: `5px` (cards/imagens), `8–14px` (elementos menores), `999px` (pills), `50%` (avatares).
 - **FAQ**: `<details>/<summary>` com `+`/`−` em dourado — reutilizar o padrão existente.
-- **Sliders/carrosséis**: scroll horizontal com `.hide-scroll`, cards `flex:0 0 300px` e `scroll-snap-align:start` (vira `78vw` no mobile via responsivo).
-- **Cards de congresso** (tela Congressos): linha em grid `190px 1fr auto` (data grande + badge de edição | local/título/descrição | CTA "Saiba mais" navy → WhatsApp `wa.me/5521980936347` com mensagem pré-preenchida). Abaixo de 880px o grid vira 1 coluna automaticamente.
+- **Sliders/carrosséis**: scroll horizontal com `.hide-scroll`, cards `flex:0 0 300px` e `scroll-snap-align:start`; setas via `[data-slide]` dentro de `[data-row]`.
 
 ### Copy e acessibilidade
 
-- **Sem travessões** (— ou –) no texto; usar vírgula, dois-pontos ou ponto (decisão de copy já aplicada, ver commit e23dd32).
+- **Sem travessões** (— ou –) no texto; usar vírgula, dois-pontos ou ponto (decisão de copy, commit e23dd32).
 - Português do Brasil, tom direto; termos-chave: Lei 14.133/21, TCU, In Company, Bruno Verzani.
-- Toda `<img>` com `alt` descritivo. Respeitar `prefers-reduced-motion` em qualquer animação nova. Foco visível dourado já é global — não remover outlines.
+- Toda `<img>` com `alt` descritivo. Respeitar `prefers-reduced-motion` em qualquer animação nova. Não remover outlines de foco.
+- Contato/CTAs de conversão: WhatsApp `wa.me/5521980936347` com mensagem pré-preenchida.
 
-## Assets
+## Pendência: features a portar para o Next.js
 
-- Imagens/posters em `assets/` (SVG para ilustrações/posters, jpg/png para fotos). Referenciar sempre como `assets/nome.ext` (cache imutável de 1 ano via `vercel.json` — trocar conteúdo exige trocar o nome do arquivo).
-- Fontes `.woff2` e os dois `.js` de hash são da exportação original: não renomear nem remover.
+A migração para Next.js partiu do site **anterior** às features abaixo, que existem prontas no `index.html` do commit `1208a93` (branch `feature/painel-adm`) e precisam ser portadas para `content.js`/rotas:
+
+- Menu dropdown com categorias **Capacitação** (Cursos, Congressos) e **Treinamentos** (In Company).
+- Página **Congressos** (agenda de eventos).
+- Página de **detalhes do curso** (mapa de dados `CURSOS`, 6 cursos, programa em accordion, box de matrícula).
+- **LP por congresso** (mapa de dados `CONGRESSOS`, 4 eventos, countdown, programação por dia).
