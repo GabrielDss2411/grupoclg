@@ -101,12 +101,16 @@ for (const m of all.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) {
 }
 
 /* ---------------- 6. Estrutura ---------------- */
-for (const exp of ['home', 'cursos', 'congressos', 'sobre', 'incompany', 'navbar', 'footer']) {
-  if (!new RegExp(`export const ${exp}\\b`).test(content)) {
+// home/cursos viraram builders parametrizados por lista vinda do banco
+// (Fase 3/T12: homeHtml(cursos), cursosPageHtml(cursos)); congressos não tem
+// mais um re-export próprio em lib/content.js -- a página chama
+// congressosPageHtml(congressos) direto de lib/congressos-data.js.
+for (const exp of ['homeHtml', 'cursosPageHtml', 'sobre', 'incompany', 'navbar', 'footer']) {
+  if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/content.js.`);
   }
 }
-for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPage']) {
+for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPageHtml']) {
   if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/cursos-data.js / lib/congressos-data.js.`);
   }

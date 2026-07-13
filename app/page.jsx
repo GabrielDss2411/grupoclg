@@ -1,6 +1,8 @@
 import Screen from '@/components/Screen';
-import { home } from '@/lib/content';
+import { getCursos } from '@/lib/db';
+import { homeHtml } from '@/lib/content';
 
-export default function HomePage() {
-  return <Screen html={home} />;
+export default async function HomePage() {
+  const cursos = await getCursos();
+  return <Screen html={homeHtml(cursos)} />;
 }
