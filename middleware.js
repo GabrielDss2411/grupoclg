@@ -31,6 +31,12 @@ export async function middleware(request) {
   // dispara o refresh acima quando necessário, antes que a rota seja servida.
   await supabase.auth.getUser();
 
+  // app/admin/layout.jsx precisa saber a rota atual para decidir se
+  // redireciona para /admin/login (sem sessão) sem entrar em loop quando a
+  // rota já É /admin/login. Não há hook de pathname em Server Component;
+  // o padrão é o middleware repassar via header.
+  response.headers.set('x-pathname', request.nextUrl.pathname);
+
   return response;
 }
 
