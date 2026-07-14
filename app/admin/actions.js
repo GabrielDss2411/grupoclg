@@ -143,14 +143,20 @@ export async function salvarCurso(formData) {
   };
 
   try {
+    let data, error;
     if (id) {
-      // Edição: id presente -> upsert cai no caminho de UPDATE; slug não é
-      // recalculado nem reenviado (mantém o valor já persistido -- AC P1-B/4).
-      payload.id = id;
+      // Edição: UPDATE real (não upsert) -- só as colunas do payload são
+      // tocadas, então omitir "slug" de fato preserva o valor já persistido
+      // (AC P1-B/4). upsert() gera um INSERT ... ON CONFLICT DO UPDATE
+      // completo; com "slug" ausente do payload, o INSERT falha com
+      // "null value in column slug violates not-null constraint" antes de
+      // chegar na resolução do conflito -- bug real encontrado em UAT
+      // (payload de teste x fixture Postgres real).
+      ({ data, error } = await supabase.from('cursos').update(payload).eq('id', id).select().single());
     } else {
       payload.slug = await uniqueSlug(supabase, 'cursos', slugify(title));
+      ({ data, error } = await supabase.from('cursos').insert(payload).select().single());
     }
-    const { data, error } = await supabase.from('cursos').upsert(payload).select().single();
     if (error) return { ok: false, error: ERRO_BANCO };
 
     revalidateTag('cursos');
@@ -202,12 +208,14 @@ export async function salvarCongresso(formData) {
   };
 
   try {
+    let data, error;
     if (id) {
-      payload.id = id;
+      // Edição: UPDATE real -- ver nota equivalente em salvarCurso.
+      ({ data, error } = await supabase.from('congressos').update(payload).eq('id', id).select().single());
     } else {
       payload.slug = await uniqueSlug(supabase, 'congressos', slugify(nome));
+      ({ data, error } = await supabase.from('congressos').insert(payload).select().single());
     }
-    const { data, error } = await supabase.from('congressos').upsert(payload).select().single();
     if (error) return { ok: false, error: ERRO_BANCO };
 
     revalidateTag('congressos');
