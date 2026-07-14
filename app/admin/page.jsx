@@ -1,6 +1,23 @@
-// Visão geral do painel. Placeholder simples nesta etapa (T16); T18 preenche
-// com contagens reais de cursos/congressos.
-export default function AdminHomePage() {
+// Visão geral do painel: contagens reais de cursos/congressos (T18) + links
+// para as listas.
+import { createClient } from '@/lib/supabase/server-actions';
+
+async function contar(supabase, tabela, filtroDisponivel) {
+  let query = supabase.from(tabela).select('*', { count: 'exact', head: true });
+  if (filtroDisponivel !== undefined) query = query.eq('disponivel', filtroDisponivel);
+  const { count } = await query;
+  return count ?? 0;
+}
+
+export default async function AdminHomePage() {
+  const supabase = await createClient();
+  const [totalCursos, cursosDisponiveis, totalCongressos, congressosDisponiveis] = await Promise.all([
+    contar(supabase, 'cursos'),
+    contar(supabase, 'cursos', true),
+    contar(supabase, 'congressos'),
+    contar(supabase, 'congressos', true),
+  ]);
+
   return (
     <div>
       <div style={{ fontSize: '12px', letterSpacing: '2.4px', fontWeight: 700, color: '#A89A6E' }}>
@@ -30,7 +47,7 @@ export default function AdminHomePage() {
         >
           <div style={{ fontSize: '17px', fontWeight: 600, color: '#0C1A57' }}>Cursos</div>
           <p style={{ fontSize: '14px', color: '#5A6180', margin: '6px 0 0' }}>
-            Ver, incluir e editar cursos.
+            {totalCursos} no total · {cursosDisponiveis} disponíveis no site
           </p>
         </a>
         <a
@@ -48,7 +65,7 @@ export default function AdminHomePage() {
         >
           <div style={{ fontSize: '17px', fontWeight: 600, color: '#0C1A57' }}>Congressos</div>
           <p style={{ fontSize: '14px', color: '#5A6180', margin: '6px 0 0' }}>
-            Ver, incluir e editar congressos e sua programação.
+            {totalCongressos} no total · {congressosDisponiveis} disponíveis no site
           </p>
         </a>
       </div>
