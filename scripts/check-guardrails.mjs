@@ -22,7 +22,7 @@ const content =
   '\n' +
   read('lib/supabase/server.js');
 const css = read('app/base.css') + '\n' + read('app/globals.css');
-const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/cursos/[slug]/page.jsx', 'app/congressos/page.jsx', 'app/congressos/[slug]/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
+const jsxFiles = ['app/layout.jsx', 'app/(site)/layout.jsx', 'app/(site)/page.jsx', 'app/(site)/cursos/page.jsx', 'app/(site)/cursos/[slug]/page.jsx', 'app/(site)/congressos/page.jsx', 'app/(site)/congressos/[slug]/page.jsx', 'app/(site)/sobre/page.jsx', 'app/(site)/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
   .filter((p) => existsSync(join(root, p)));
 const jsx = jsxFiles.map(read).join('\n');
 const handlers = read('components/handlers.js');
