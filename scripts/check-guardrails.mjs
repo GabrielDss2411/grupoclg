@@ -11,9 +11,18 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
-const content = read('lib/content.js') + '\n' + read('lib/cursos-data.js') + '\n' + read('lib/congressos-data.js');
+const content =
+  read('lib/content.js') +
+  '\n' +
+  read('lib/cursos-data.js') +
+  '\n' +
+  read('lib/congressos-data.js') +
+  '\n' +
+  read('lib/db.js') +
+  '\n' +
+  read('lib/supabase/server.js');
 const css = read('app/base.css') + '\n' + read('app/globals.css');
-const jsxFiles = ['app/layout.jsx', 'app/page.jsx', 'app/cursos/page.jsx', 'app/cursos/[slug]/page.jsx', 'app/congressos/page.jsx', 'app/congressos/[slug]/page.jsx', 'app/sobre/page.jsx', 'app/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
+const jsxFiles = ['app/layout.jsx', 'app/(site)/layout.jsx', 'app/(site)/page.jsx', 'app/(site)/cursos/page.jsx', 'app/(site)/cursos/[slug]/page.jsx', 'app/(site)/congressos/page.jsx', 'app/(site)/congressos/[slug]/page.jsx', 'app/(site)/sobre/page.jsx', 'app/(site)/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
   .filter((p) => existsSync(join(root, p)));
 const jsx = jsxFiles.map(read).join('\n');
 const handlers = read('components/handlers.js');
@@ -101,12 +110,16 @@ for (const m of all.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) {
 }
 
 /* ---------------- 6. Estrutura ---------------- */
-for (const exp of ['home', 'cursos', 'congressos', 'sobre', 'incompany', 'navbar', 'footer']) {
-  if (!new RegExp(`export const ${exp}\\b`).test(content)) {
+// home/cursos viraram builders parametrizados por lista vinda do banco
+// (Fase 3/T12: homeHtml(cursos), cursosPageHtml(cursos)); congressos não tem
+// mais um re-export próprio em lib/content.js -- a página chama
+// congressosPageHtml(congressos) direto de lib/congressos-data.js.
+for (const exp of ['homeHtml', 'cursosPageHtml', 'sobre', 'incompany', 'navbar', 'footer']) {
+  if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/content.js.`);
   }
 }
-for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPage']) {
+for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPageHtml']) {
   if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/cursos-data.js / lib/congressos-data.js.`);
   }
