@@ -28,33 +28,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div
+    <form
+      onSubmit={onSubmit}
       style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '30px',
+        width: '100%',
+        maxWidth: '390px',
+        background: '#fff',
+        border: '1px solid #e5e5ea',
+        borderRadius: '18px',
+        padding: '36px 32px',
+        boxShadow: '0 30px 60px -40px rgba(10,20,66,0.55)',
       }}
     >
-      <form
-        onSubmit={onSubmit}
+      <div
         style={{
-          width: '100%',
-          maxWidth: '380px',
-          background: '#fff',
-          border: '1px solid #e5e5ea',
-          borderRadius: '16px',
-          padding: '36px 32px',
-          boxShadow: '0 20px 44px -34px rgba(10,20,66,0.45)',
+          display: 'inline-flex', alignItems: 'center',
+          background: '#0C1A57', borderRadius: '14px',
+          padding: '13px 18px', marginBottom: '20px',
         }}
       >
-        <div style={{ fontSize: '12px', letterSpacing: '2.4px', fontWeight: 700, color: '#A89A6E' }}>
-          PAINEL ADMINISTRATIVO
-        </div>
-        <h1 style={{ fontWeight: 600, fontSize: '26px', color: '#0C1A57', margin: '10px 0 0' }}>
-          Entrar
-        </h1>
+        <img src="/assets/logo-grupoclg.png" alt="Grupo CLG" style={{ height: '32px', width: 'auto', display: 'block' }} />
+      </div>
+      <div style={{ fontSize: '12px', letterSpacing: '2.4px', fontWeight: 700, color: '#A89A6E' }}>
+        PAINEL ADMINISTRATIVO
+      </div>
+      <h1 style={{ fontWeight: 600, fontSize: '26px', color: '#0C1A57', margin: '10px 0 0' }}>
+        Entrar
+      </h1>
 
         <label style={{ display: 'block', marginTop: '22px' }}>
           <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#42496A' }}>E-mail</span>
@@ -126,7 +126,6 @@ export default function LoginPage() {
         >
           {pending ? 'Entrando…' : 'Entrar'}
         </button>
-      </form>
-    </div>
+    </form>
   );
 }

@@ -24,37 +24,12 @@ export default function ToggleDisponivel({ tipo, id, valor }) {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-      {!valor && (
-        <span
-          style={{
-            fontSize: '11.5px',
-            fontWeight: 700,
-            color: '#8A90A6',
-            background: '#f5f5f7',
-            border: '1px solid #e5e5ea',
-            borderRadius: '999px',
-            padding: '4px 10px',
-          }}
-        >
-          fora do site
-        </span>
-      )}
+      {!valor && <span className="adm-badge-off">fora do site</span>}
       <button
         type="button"
         onClick={toggle}
         disabled={pending}
-        style={{
-          background: valor ? 'rgba(91,214,160,0.16)' : '#f5f5f7',
-          border: `1px solid ${valor ? 'rgba(91,214,160,0.4)' : '#e5e5ea'}`,
-          color: valor ? '#0C1A57' : '#5A6180',
-          borderRadius: '999px',
-          padding: '7px 16px',
-          fontSize: '12.5px',
-          fontWeight: 700,
-          cursor: pending ? 'default' : 'pointer',
-          opacity: pending ? 0.6 : 1,
-        }}
-        data-hv="card"
+        className={`adm-toggle ${valor ? 'adm-toggle-on' : 'adm-toggle-off'}`}
       >
         {pending ? 'Salvando…' : valor ? 'Disponível' : 'Indisponível'}
       </button>

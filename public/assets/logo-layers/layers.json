@@ -1,0 +1,98 @@
+{
+  "minX": 43,
+  "minY": 119,
+  "maxX": 1516,
+  "maxY": 862,
+  "w": 1473,
+  "h": 743,
+  "layers": [
+    {
+      "id": "Camada_2",
+      "x": 43,
+      "y": 135,
+      "w": 261,
+      "h": 328,
+      "file": "Camada_2.png"
+    },
+    {
+      "id": "Camada_3",
+      "x": 368,
+      "y": 215,
+      "w": 144,
+      "h": 241,
+      "file": "Camada_3.png"
+    },
+    {
+      "id": "Camada_4",
+      "x": 543,
+      "y": 219,
+      "w": 235,
+      "h": 246,
+      "file": "Camada_4.png"
+    },
+    {
+      "id": "Camada_5",
+      "x": 845,
+      "y": 215,
+      "w": 227,
+      "h": 327,
+      "file": "Camada_5.png"
+    },
+    {
+      "id": "Camada_6",
+      "x": 926,
+      "y": 119,
+      "w": 532,
+      "h": 602,
+      "file": "Camada_6.png"
+    },
+    {
+      "id": "Camada_7",
+      "x": 1152,
+      "y": 215,
+      "w": 242,
+      "h": 227,
+      "file": "Camada_7.png"
+    },
+    {
+      "id": "Camada_8",
+      "x": 991,
+      "y": 358,
+      "w": 525,
+      "h": 504,
+      "file": "Camada_8.png"
+    },
+    {
+      "id": "Camada_11",
+      "x": 45,
+      "y": 527,
+      "w": 248,
+      "h": 308,
+      "file": "Camada_11.png"
+    },
+    {
+      "id": "Camada_10",
+      "x": 318,
+      "y": 531,
+      "w": 218,
+      "h": 299,
+      "file": "Camada_10.png"
+    },
+    {
+      "id": "Camada_9",
+      "x": 529,
+      "y": 527,
+      "w": 257,
+      "h": 308,
+      "file": "Camada_9.png"
+    },
+    {
+      "id": "Camada_12",
+      "x": 863,
+      "y": 571,
+      "w": 527,
+      "h": 264,
+      "file": "Camada_12.png"
+    }
+  ]
+}

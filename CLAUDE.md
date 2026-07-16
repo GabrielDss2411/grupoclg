@@ -63,7 +63,7 @@ Consequência: **alterar um valor inline no content.js pode quebrar silenciosame
 
 - **Botões**: sempre pill (`border-radius:999px`). Primário = amarelo `#E9C65A` → hover `#F0D171`, texto `#0A1442`, `font-weight:700`. Secundário = navy `#0C1A57` → hover `#081142`, texto branco.
 - **CTA único**: o CTA principal do site é **"Ver turmas abertas"** (`data-nav="cursos"`). Não criar CTAs primários concorrentes; secundário permitido: "Ver treinamentos In Company".
-- **Cantos**: o CSS força radius 16–30px para **5px** (cantos crispos). Em código novo, usar diretamente: `5px` (cards/imagens), `8–14px` (elementos menores), `999px` (pills), `50%` (avatares).
+- **Cantos (padrão único do site)**: o CSS em `app/base.css` normaliza o radius inline de **12–30px** de cards/painéis/imagens para **20px**, uniformizando todos os cards do site. Exceções mantidas com o próprio raio: elementos com `pointer-events` no style (ex.: navbar, cards do carrossel da home) e tiles de ícone com `width:46px`. Em código novo usar: `20px` (cards/painéis/imagens), `8–12px` (tiles/elementos menores), `999px` (pills), `50%` (avatares). Não reintroduzir cantos crispos de 5px em cards.
 - **FAQ**: `<details>/<summary>` com `+`/`−` em dourado — reutilizar o padrão existente.
 - **Sliders/carrosséis**: scroll horizontal com `.hide-scroll`, cards `flex:0 0 300px` e `scroll-snap-align:start`; setas via `[data-slide]` dentro de `[data-row]`.
 

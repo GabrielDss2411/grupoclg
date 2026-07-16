@@ -1,0 +1,91 @@
+/* =========================================================================
+   Intro de logo do hero (2 fases): preloader (100% CSS, roda no 1º paint) ->
+   logo gigante (GSAP). O <svg> tem overflow:hidden e funciona como máscara:
+   cada camada do logo (um <g>) começa deslocada pra baixo do viewBox e sobe.
+   Fundo sempre navy (nunca pisca branco): só os elementos internos começam
+   com opacity 0, nunca o fundo.
+   Offset de subida (O) = altura do viewBox da arte (743 unidades), aplicado
+   como translateY em unidades de usuário do SVG.
+   ========================================================================= */
+
+.hi-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 620px at 74% 34%, rgba(41, 66, 150, 0.55), transparent 58%),
+    linear-gradient(158deg, #0C1A57, #070E33);
+}
+
+/* <svg> máscara: overflow hidden clipa as camadas deslocadas pra baixo */
+.hi-svg { width: 100%; height: auto; display: block; overflow: hidden; }
+.hi-svg image { image-rendering: auto; }
+
+/* ---------------- Logo gigante (fase 2, GSAP) ---------------- */
+.hi-giant {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(64vw, 1180px);
+  opacity: 0;                       /* revelado pelo GSAP (evita flash antes do JS) */
+  will-change: opacity;
+}
+.hi-g-ltr { will-change: transform; }
+
+/* ---------------- Preloader (fase 1, CSS puro) ---------------- */
+.hi-pre {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 620px at 74% 34%, rgba(41, 66, 150, 0.55), transparent 58%),
+    linear-gradient(158deg, #0C1A57, #070E33);
+  /* saída: o frame inteiro é "sugado" pra cima após o hold */
+  animation: hiPreExit 0.6s cubic-bezier(0.7, 0, 0.84, 0) 1.5s forwards;
+  will-change: transform;
+}
+.hi-pre-logo { width: min(60vw, 720px); }
+
+/* cada letra sobe de translateY(O) até 0, escalonada por --i */
+.hi-pre-ltr {
+  transform: translateY(743px);
+  animation: hiRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i) * 0.08s);
+  will-change: transform;
+}
+
+@keyframes hiRise { to { transform: translateY(0); } }
+@keyframes hiPreExit { to { transform: translateY(-100%); } }
+
+/* ---------------- Textos dos cantos (fase 2) ---------------- */
+.hi-corner {
+  position: fixed;
+  z-index: 1;
+  opacity: 0;                       /* entram via GSAP */
+  font-family: var(--font-inter), -apple-system, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: 2.4px;
+  font-weight: 700;
+  color: #B7C0DC;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.hi-corner b { color: #E9C65A; font-weight: 700; }
+.hi-tl { top: 30px; left: 34px; }
+.hi-tr { top: 30px; right: 34px; text-align: right; }
+.hi-bl { bottom: 30px; left: 34px; }
+.hi-br { bottom: 30px; right: 34px; text-align: right; }
+
+@media (max-width: 600px) {
+  .hi-corner { font-size: 10px; letter-spacing: 1.8px; }
+  .hi-tl, .hi-bl { left: 18px; }
+  .hi-tr, .hi-br { right: 18px; }
+}
+
+/* Failsafe: sem animação, mostra estado final (fundo só; hero aparece atrás) */
+@media (prefers-reduced-motion: reduce) {
+  .hi-root { display: none; }
+}

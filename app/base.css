@@ -32,15 +32,19 @@ details[open]>summary::after{content:'\2212'}
 [style*="Newsreader"], [style*="Hanken"], [style*="Schibsted"]{
   font-family:-apple-system, system-ui, BlinkMacSystemFont,'Inter','Segoe UI',Roboto, sans-serif !important;
 }
-/* cantos crispos (mantidos) */
+/* Padronização de cantos: todo card/painel/imagem (raio inline 16-30px) é
+   normalizado para 20px, uniformizando o site inteiro. Pills (999px), avatares
+   (50%) e elementos menores (8-14px) ficam com o próprio raio. */
+[style*="border-radius:12px"]:not([style*="pointer-events"]):not([style*="width:46px"]),
+[style*="border-radius:14px"]:not([style*="pointer-events"]),
 [style*="border-radius:16px"]:not([style*="pointer-events"]),
+[style*="border-radius:17px"]:not([style*="pointer-events"]),
 [style*="border-radius:18px"]:not([style*="pointer-events"]),
-[style*="border-radius:20px"]:not([style*="pointer-events"]),
 [style*="border-radius:22px"]:not([style*="pointer-events"]),
 [style*="border-radius:24px"]:not([style*="pointer-events"]),
 [style*="border-radius:26px"]:not([style*="pointer-events"]),
 [style*="border-radius:28px"]:not([style*="pointer-events"]),
-[style*="border-radius:30px"]:not([style*="pointer-events"]){ border-radius:5px !important }
+[style*="border-radius:30px"]:not([style*="pointer-events"]){ border-radius:20px !important }
 ::selection{background:#0C1A57;color:#fff}
 image-slot{display:block}
 button{font-family:inherit}
@@ -144,7 +148,6 @@ img{max-width:100%}
   /* navbar cabe no celular */
   [style*="z-index:60;padding:18px 24px"]{padding:10px 14px !important}
   [style*="pointer-events:auto;width:100%;max-width:1200px"]{gap:10px !important}
-  [style*="color:#C9B26B"]{display:none !important}
   div[style*="margin-left:auto;display:flex;align-items:center;gap:20px"] button{padding:8px 14px !important;font-size:12px !important}
   [style*="pointer-events:auto;width:100%;max-width:1200px"]{gap:8px !important;padding-left:14px !important;padding-right:10px !important}
 }
