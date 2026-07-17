@@ -1,5 +1,5 @@
 import Screen from '@/components/Screen';
-import { getCongressos } from '@/lib/db';
+import { getCongressos, seguroNoBuild } from '@/lib/db';
 import { congressosPageHtml } from '@/lib/congressos-data';
 
 export const metadata = {
@@ -9,6 +9,6 @@ export const metadata = {
 };
 
 export default async function CongressosPage() {
-  const congressos = await getCongressos();
+  const congressos = await seguroNoBuild(getCongressos(), []);
   return <Screen html={congressosPageHtml(congressos)} />;
 }

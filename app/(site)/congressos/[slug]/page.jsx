@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation';
 import Screen from '@/components/Screen';
-import { getCongressos, getCongresso } from '@/lib/db';
+import { getCongressos, getCongresso, seguroNoBuild } from '@/lib/db';
 import { congressoHtml } from '@/lib/congressos-data';
 
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const congressos = await getCongressos();
+  const congressos = await seguroNoBuild(getCongressos(), []);
   return congressos.map((c) => ({ slug: c.slug }));
 }
 

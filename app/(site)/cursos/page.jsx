@@ -1,5 +1,5 @@
 import Screen from '@/components/Screen';
-import { getCursos } from '@/lib/db';
+import { getCursos, seguroNoBuild } from '@/lib/db';
 import { cursosPageHtml } from '@/lib/content';
 
 export const metadata = {
@@ -9,6 +9,6 @@ export const metadata = {
 };
 
 export default async function CursosPage() {
-  const cursos = await getCursos();
+  const cursos = await seguroNoBuild(getCursos(), []);
   return <Screen html={cursosPageHtml(cursos)} />;
 }

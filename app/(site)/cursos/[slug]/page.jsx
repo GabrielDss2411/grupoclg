@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation';
 import Screen from '@/components/Screen';
-import { getCursos, getCurso } from '@/lib/db';
+import { getCursos, getCurso, seguroNoBuild } from '@/lib/db';
 import { cursoHtml } from '@/lib/cursos-data';
 
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const cursos = await getCursos();
+  const cursos = await seguroNoBuild(getCursos(), []);
   return cursos.map((c) => ({ slug: c.slug }));
 }
 
