@@ -28,23 +28,30 @@ const IconBook = () => (<svg viewBox="0 0 24 24" {...s}><path d="M4 4.5A1.5 1.5 
 const IconCalendar = () => (<svg viewBox="0 0 24 24" {...s}><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /></svg>);
 const IconEyeOff = () => (<svg viewBox="0 0 24 24" {...s}><path d="M9.9 5A9.8 9.8 0 0 1 12 4.8c6 0 9.5 6.2 9.5 6.2a16 16 0 0 1-3 3.5M6 6.3A16 16 0 0 0 2.5 11s3.5 6.2 9.5 6.2a9 9 0 0 0 4-.9" /><path d="M3 3l18 18M10 10a2.5 2.5 0 0 0 3.4 3.4" /></svg>);
 const IconEdit = () => (<svg viewBox="0 0 24 24" {...s}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>);
+const IconInscricao = () => (<svg viewBox="0 0 24 24" {...s}><path d="M5 4.5h14v15H5z" /><path d="M8.5 9.5l2.5 2.5 4.5-4.5" /><path d="M8.5 15.5h7" /></svg>);
 
 export default async function AdminHomePage() {
   const supabase = await createClient();
-  const [cursosRes, congressosRes] = await Promise.all([
+  const [cursosRes, congressosRes, artigosRes, inscricoesRes] = await Promise.all([
     supabase.from('cursos').select('id, title, cat, disponivel, created_at').order('created_at', { ascending: false }),
     supabase.from('congressos').select('id, nome, edicao, disponivel, created_at').order('created_at', { ascending: false }),
+    supabase.from('artigos').select('id, titulo, categoria, disponivel, created_at').order('created_at', { ascending: false }),
+    supabase.from('inscricoes').select('id', { count: 'exact', head: true }),
   ]);
 
   const cursos = cursosRes.data ?? [];
   const congressos = congressosRes.data ?? [];
+  const artigos = artigosRes.data ?? [];
+  const totalInscricoes = inscricoesRes.count ?? 0;
 
   const totalCursos = cursos.length;
   const cursosOn = cursos.filter((c) => c.disponivel).length;
   const totalCongressos = congressos.length;
   const congressosOn = congressos.filter((c) => c.disponivel).length;
-  const total = totalCursos + totalCongressos;
-  const publicado = cursosOn + congressosOn;
+  const totalArtigos = artigos.length;
+  const artigosOn = artigos.filter((a) => a.disponivel).length;
+  const total = totalCursos + totalCongressos + totalArtigos;
+  const publicado = cursosOn + congressosOn + artigosOn;
   const foraSite = total - publicado;
   const pctOn = total ? Math.round((publicado / total) * 100) : 0;
 
@@ -52,12 +59,13 @@ export default async function AdminHomePage() {
   const R = 62, STROKE = 15, CIRC = 2 * Math.PI * R;
   const dash = (pctOn / 100) * CIRC;
 
-  const maxTotal = Math.max(totalCursos, totalCongressos, 1);
+  const maxTotal = Math.max(totalCursos, totalCongressos, totalArtigos, 1);
   const hPx = (n) => `${Math.round((n / maxTotal) * 170)}px`;
 
   const recentes = [
     ...cursos.map((c) => ({ id: c.id, tipo: 'Curso', href: `/admin/cursos/${c.id}`, titulo: c.title, sub: c.cat, on: c.disponivel, data: c.created_at })),
     ...congressos.map((c) => ({ id: c.id, tipo: 'Congresso', href: `/admin/congressos/${c.id}`, titulo: c.nome, sub: c.edicao, on: c.disponivel, data: c.created_at })),
+    ...artigos.map((a) => ({ id: a.id, tipo: 'Artigo', href: `/admin/artigos/${a.id}`, titulo: a.titulo, sub: a.categoria, on: a.disponivel, data: a.created_at })),
   ]
     .sort((a, b) => new Date(b.data) - new Date(a.data))
     .slice(0, 6);
@@ -65,7 +73,9 @@ export default async function AdminHomePage() {
   const metrics = [
     { label: 'Cursos', value: totalCursos, on: cursosOn, total: totalCursos, sub: `${cursosOn} no site`, Icon: IconBook, navy: false },
     { label: 'Congressos', value: totalCongressos, on: congressosOn, total: totalCongressos, sub: `${congressosOn} no site`, Icon: IconCalendar, navy: false },
+    { label: 'Artigos', value: totalArtigos, on: artigosOn, total: totalArtigos, sub: `${artigosOn} no site`, Icon: IconBook, navy: false },
     { label: 'Fora do site', value: foraSite, on: foraSite, total: total || 1, sub: 'ocultos do público', Icon: IconEyeOff, navy: true },
+    { label: 'Inscrições', value: totalInscricoes, on: totalInscricoes, total: totalInscricoes || 1, sub: 'recebidas no total', Icon: IconInscricao, navy: true, href: '/admin/inscricoes' },
   ];
 
   return (
@@ -84,7 +94,7 @@ export default async function AdminHomePage() {
 
       <div className="adm-metrics">
         {metrics.map((m) => (
-          <div className="adm-card adm-metric" key={m.label}>
+          <a className="adm-card adm-metric" key={m.label} href={m.href || '#'} style={{ textDecoration: 'none', cursor: m.href ? 'pointer' : 'default', pointerEvents: m.href ? 'auto' : 'none' }}>
             <div className="adm-metric-top">
               <span className="adm-metric-icon"><m.Icon /></span>
               <span className="adm-metric-label">{m.label}</span>
@@ -97,7 +107,7 @@ export default async function AdminHomePage() {
               <span className="adm-metric-sub">{m.sub}</span>
               <span className="adm-metric-sub">{m.total ? Math.round((m.on / m.total) * 100) : 0}%</span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
@@ -118,6 +128,7 @@ export default async function AdminHomePage() {
             {[
               { nome: 'Cursos', on: cursosOn, off: totalCursos - cursosOn, total: totalCursos },
               { nome: 'Congressos', on: congressosOn, off: totalCongressos - congressosOn, total: totalCongressos },
+              { nome: 'Artigos', on: artigosOn, off: totalArtigos - artigosOn, total: totalArtigos },
             ].map((g) => (
               <div className="adm-bar-group" key={g.nome}>
                 <div className="adm-bar-stack" style={{ height: hPx(g.total) }}>
@@ -172,6 +183,7 @@ export default async function AdminHomePage() {
           <div className="adm-gauge-actions">
             <a href="/admin/cursos/novo" className="adm-btn adm-btn-gold adm-btn-sm">Novo curso</a>
             <a href="/admin/congressos/novo" className="adm-btn adm-btn-navy adm-btn-sm">Novo congresso</a>
+            <a href="/admin/artigos/novo" className="adm-btn adm-btn-navy adm-btn-sm">Novo artigo</a>
           </div>
         </div>
       </div>

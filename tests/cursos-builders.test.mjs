@@ -35,4 +35,11 @@ describe('cursoHtml (builder parametrizado)', () => {
     expect(html).not.toContain('<script>alert(1)</script>');
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
   });
+
+  it('CTA "Garantir vaga" abre o modal da ficha (data-ficha), não redireciona direto pro WhatsApp', () => {
+    const curso = toColumnShape('lei-14133');
+    const html = cursoHtml(curso);
+    expect(html).toMatch(/<button[^>]*data-ficha[^>]*>Garantir vaga/);
+    expect(html).not.toContain('wa.me');
+  });
 });

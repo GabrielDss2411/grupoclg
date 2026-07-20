@@ -11,6 +11,8 @@ const s = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLineca
 const IconGrid = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>);
 const IconBook = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2z" /><path d="M4 18.5A1.5 1.5 0 0 1 5.5 17H20" /></svg>);
 const IconCalendar = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /></svg>);
+const IconArtigo = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><path d="M6 3.5h9l3 3v14H6z" /><path d="M15 3.5V6.5h3" /><path d="M9 11h6M9 14.5h6M9 18h4" /></svg>);
+const IconInscricao = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><path d="M5 4.5h14v15H5z" /><path d="M8.5 9.5l2.5 2.5 4.5-4.5" /><path d="M8.5 15.5h7" /></svg>);
 const IconChevron = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><path d="M9 6l6 6-6 6" /></svg>);
 const IconLogout = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><path d="M15 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3" /><path d="M10 17l-5-5 5-5M15 12H5" /></svg>);
 const IconPanel = (p) => (<svg viewBox="0 0 24 24" {...s} {...p}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></svg>);
@@ -25,6 +27,11 @@ const NAV = [
     href: '/admin/congressos', label: 'Congressos', Icon: IconCalendar,
     sub: [{ href: '/admin/congressos', label: 'Agenda' }, { href: '/admin/congressos/novo', label: 'Novo congresso' }],
   },
+  {
+    href: '/admin/artigos', label: 'Artigos', Icon: IconArtigo,
+    sub: [{ href: '/admin/artigos', label: 'Todos os artigos' }, { href: '/admin/artigos/novo', label: 'Novo artigo' }],
+  },
+  { href: '/admin/inscricoes', label: 'Inscrições', Icon: IconInscricao },
 ];
 
 const matches = (pathname, href) =>

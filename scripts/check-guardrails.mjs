@@ -18,11 +18,13 @@ const content =
   '\n' +
   read('lib/congressos-data.js') +
   '\n' +
+  read('lib/artigos-data.js') +
+  '\n' +
   read('lib/db.js') +
   '\n' +
   read('lib/supabase/server.js');
 const css = read('app/base.css') + '\n' + read('app/globals.css');
-const jsxFiles = ['app/layout.jsx', 'app/(site)/layout.jsx', 'app/(site)/page.jsx', 'app/(site)/cursos/page.jsx', 'app/(site)/cursos/[slug]/page.jsx', 'app/(site)/congressos/page.jsx', 'app/(site)/congressos/[slug]/page.jsx', 'app/(site)/sobre/page.jsx', 'app/(site)/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx']
+const jsxFiles = ['app/layout.jsx', 'app/(site)/layout.jsx', 'app/(site)/page.jsx', 'app/(site)/cursos/page.jsx', 'app/(site)/cursos/[slug]/page.jsx', 'app/(site)/congressos/page.jsx', 'app/(site)/congressos/[slug]/page.jsx', 'app/(site)/artigos/page.jsx', 'app/(site)/artigos/[slug]/page.jsx', 'app/(site)/sobre/page.jsx', 'app/(site)/in-company/page.jsx', 'components/Navbar.jsx', 'components/Footer.jsx', 'components/Screen.jsx', 'components/FichaInscricao.jsx', 'components/DetalheComFicha.jsx']
   .filter((p) => existsSync(join(root, p)));
 const jsx = jsxFiles.map(read).join('\n');
 const handlers = read('components/handlers.js');
@@ -119,12 +121,12 @@ for (const exp of ['homeHtml', 'cursosPageHtml', 'sobre', 'incompany', 'navbar',
     errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/content.js.`);
   }
 }
-for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPageHtml']) {
+for (const exp of ['CURSOS', 'cursoHtml', 'CONGRESSOS', 'congressoHtml', 'congressosPageHtml', 'ARTIGOS', 'artigoHtml', 'artigosPageHtml']) {
   if (!new RegExp(`export (const|function) ${exp}\\b`).test(content)) {
-    errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/cursos-data.js / lib/congressos-data.js.`);
+    errors.push(`Estrutura quebrada: export "${exp}" não encontrado em lib/cursos-data.js / lib/congressos-data.js / lib/artigos-data.js.`);
   }
 }
-for (const route of ['home', 'cursos', 'congressos', 'incompany', 'sobre']) {
+for (const route of ['home', 'cursos', 'congressos', 'incompany', 'artigos', 'sobre']) {
   if (!new RegExp(`${route}:\\s*'`).test(handlers)) {
     errors.push(`Estrutura quebrada: rota "${route}" não encontrada em ROUTES (components/handlers.js).`);
   }

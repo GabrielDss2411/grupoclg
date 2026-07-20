@@ -7,9 +7,9 @@ import { initAnimations } from '@/lib/animations';
  * Renderiza o conteúdo de uma tela (markup migrado) e ativa navegação,
  * carrosséis e animações GSAP no cliente.
  */
-export default function Screen({ html }) {
+export default function Screen({ html, onFicha }) {
   const ref = useRef(null);
-  useSiteHandlers(ref, { sliders: true });
+  useSiteHandlers(ref, { sliders: true, onFicha });
   useEffect(() => {
     const cleanup = initAnimations();
     // Countdown das LPs de congresso: calculado no cliente para nunca ficar defasado no SSG.

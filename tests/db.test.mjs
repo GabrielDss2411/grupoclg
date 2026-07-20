@@ -12,7 +12,7 @@ vi.mock('../lib/supabase/server.js', () => ({
   createClient: (...args) => mockCreateClient(...args),
 }));
 
-const { getCursos, getCurso, getCongressos, getCongresso } = await import('../lib/db.js');
+const { getCursos, getCurso, getCongressos, getCongresso, getArtigos, getArtigo } = await import('../lib/db.js');
 
 // Builder encadeável mínimo que imita a API do supabase-js: cada método de
 // filtro retorna o próprio builder, e o builder é "thenable" (resolve/rejeita
@@ -64,6 +64,24 @@ describe('lib/db.js (camada de dados cacheada sobre supabase)', () => {
     mockCreateClient.mockReturnValue(fakeSupabase({ data: null, error: null }));
     const result = await getCongresso('slug-que-nao-existe');
     expect(result).toBeNull();
+  });
+
+  it('getArtigos() retorna a lista que o client mockado devolve', async () => {
+    const artigosMock = [{ slug: 'reequilibrio-economico-financeiro', titulo: 'Reequilíbrio econômico financeiro na Lei 14.133/21: quando e como pedir' }];
+    mockCreateClient.mockReturnValue(fakeSupabase({ data: artigosMock, error: null }));
+    const result = await getArtigos();
+    expect(result).toEqual(artigosMock);
+  });
+
+  it('getArtigo(slug) inexistente retorna null (contrato)', async () => {
+    mockCreateClient.mockReturnValue(fakeSupabase({ data: null, error: null }));
+    const result = await getArtigo('slug-que-nao-existe');
+    expect(result).toBeNull();
+  });
+
+  it('getArtigos() propaga o erro quando o banco falha -- permite ao Next servir stale via ISR (ADM-09)', async () => {
+    mockCreateClient.mockReturnValue(fakeSupabase({ data: null, error: new Error('conexão recusada') }));
+    await expect(getArtigos()).rejects.toThrow('conexão recusada');
   });
 
   it('getCursos() propaga o erro quando o banco falha -- permite ao Next servir stale via ISR (ADM-09)', async () => {

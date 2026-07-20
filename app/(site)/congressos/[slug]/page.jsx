@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Screen from '@/components/Screen';
+import DetalheComFicha from '@/components/DetalheComFicha';
 import { getCongressos, getCongresso, seguroNoBuild } from '@/lib/db';
 import { congressoHtml } from '@/lib/congressos-data';
 
@@ -21,5 +21,5 @@ export default async function CongressoPage({ params }) {
   const { slug } = await params;
   const congresso = await getCongresso(slug);
   if (!congresso) notFound();
-  return <Screen html={congressoHtml(congresso)} />;
+  return <DetalheComFicha html={congressoHtml(congresso)} tipo="congresso" item={{ id: congresso.id, titulo: congresso.nome }} />;
 }

@@ -9,6 +9,7 @@ function activeKey(pathname) {
   if (pathname === '/') return 'home';
   if (pathname.startsWith('/cursos') || pathname.startsWith('/congressos')) return 'capacitacao';
   if (pathname.startsWith('/in-company')) return 'treinamentos';
+  if (pathname.startsWith('/artigos')) return 'artigos';
   if (pathname.startsWith('/sobre')) return 'sobre';
   return null;
 }

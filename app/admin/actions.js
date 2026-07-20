@@ -18,6 +18,7 @@ import { createClient } from '../../lib/supabase/server-actions.js';
 
 const MAX_TITULO = 200;
 const MAX_DESCRICAO = 2000;
+const MAX_CONTEUDO = 20000;
 const ERRO_SESSAO = 'Sessão expirada, entre novamente.';
 const ERRO_BANCO = 'Não foi possível salvar. Tente novamente.';
 const ERRO_OBRIGATORIOS = 'Preencha os campos obrigatórios.';
@@ -83,6 +84,26 @@ function validarCurso({ title, cat, descricao, poster }) {
   }
   if (descricao.length > MAX_DESCRICAO) {
     return { ok: false, error: `Descrição deve ter no máximo ${MAX_DESCRICAO} caracteres.`, fields: ['descricao'] };
+  }
+  return null;
+}
+
+function validarArtigo({ titulo, categoria, resumo, capa, conteudo }) {
+  const fields = [];
+  if (!titulo || !titulo.trim()) fields.push('titulo');
+  if (!categoria || !categoria.trim()) fields.push('categoria');
+  if (!resumo || !resumo.trim()) fields.push('resumo');
+  if (!capa || !capa.trim()) fields.push('capa');
+  if (!conteudo || !conteudo.trim()) fields.push('conteudo');
+  if (fields.length) return { ok: false, error: ERRO_OBRIGATORIOS, fields };
+  if (titulo.length > MAX_TITULO) {
+    return { ok: false, error: `Título deve ter no máximo ${MAX_TITULO} caracteres.`, fields: ['titulo'] };
+  }
+  if (resumo.length > MAX_DESCRICAO) {
+    return { ok: false, error: `Resumo deve ter no máximo ${MAX_DESCRICAO} caracteres.`, fields: ['resumo'] };
+  }
+  if (conteudo.length > MAX_CONTEUDO) {
+    return { ok: false, error: `Conteúdo deve ter no máximo ${MAX_CONTEUDO} caracteres.`, fields: ['conteudo'] };
   }
   return null;
 }
@@ -227,8 +248,46 @@ export async function salvarCongresso(formData) {
   }
 }
 
+export async function salvarArtigo(formData) {
+  const supabase = await createClient();
+  const user = await requireUser(supabase);
+  if (!user) return { ok: false, error: ERRO_SESSAO };
+
+  const id = str(formData, 'id') || null;
+  const titulo = str(formData, 'titulo');
+  const categoria = str(formData, 'categoria');
+  const resumo = str(formData, 'resumo');
+  const capa = str(formData, 'capa');
+  const autor = str(formData, 'autor', 'Bruno Verzani');
+  const conteudo = str(formData, 'conteudo');
+
+  const invalido = validarArtigo({ titulo, categoria, resumo, capa, conteudo });
+  if (invalido) return invalido;
+
+  const payload = { titulo, categoria, resumo, capa, autor, conteudo };
+
+  try {
+    let data, error;
+    if (id) {
+      // Edição: UPDATE real -- ver nota equivalente em salvarCurso.
+      ({ data, error } = await supabase.from('artigos').update(payload).eq('id', id).select().single());
+    } else {
+      payload.slug = await uniqueSlug(supabase, 'artigos', slugify(titulo));
+      ({ data, error } = await supabase.from('artigos').insert(payload).select().single());
+    }
+    if (error) return { ok: false, error: ERRO_BANCO };
+
+    revalidateTag('artigos');
+    revalidatePath(`/artigos/${data.slug}`);
+    revalidatePath('/artigos');
+    return { ok: true, slug: data.slug };
+  } catch {
+    return { ok: false, error: ERRO_BANCO };
+  }
+}
+
 export async function alternarDisponivel(tipo, id, valor) {
-  if (tipo !== 'cursos' && tipo !== 'congressos') {
+  if (tipo !== 'cursos' && tipo !== 'congressos' && tipo !== 'artigos') {
     return { ok: false, error: 'Tipo inválido.' };
   }
   const supabase = await createClient();

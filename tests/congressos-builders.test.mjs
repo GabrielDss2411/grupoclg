@@ -56,6 +56,20 @@ describe('congressoHtml (builder parametrizado)', () => {
     expect(html).not.toContain('<script>alert(1)</script>');
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
   });
+
+  it('CTA "Garantir minha vaga" (hero e final) abre o modal da ficha (data-ficha), não redireciona direto pro WhatsApp', () => {
+    const congresso = toColumnShape('nova-lei');
+    const html = congressoHtml(congresso);
+    const matches = html.match(/<button[^>]*data-ficha[^>]*>Garantir minha vaga/g) || [];
+    expect(matches.length).toBe(2);
+    expect(html).not.toMatch(/wa\.me[^"]*"[^>]*>Garantir minha vaga/);
+  });
+
+  it('mantém o link direto de WhatsApp para "Inscrição em grupo"', () => {
+    const congresso = toColumnShape('nova-lei');
+    const html = congressoHtml(congresso);
+    expect(html).toMatch(/href="https:\/\/wa\.me\/5521980936347\?text=[^"]*"[^>]*>Inscrição em grupo/);
+  });
 });
 
 describe('congressosPageHtml (agenda)', () => {
@@ -74,5 +88,30 @@ describe('congressosPageHtml (agenda)', () => {
   it('exibe estado vazio amigável quando não há congressos disponíveis (edge case)', () => {
     const html = congressosPageHtml([]);
     expect(html).toContain('Novos eventos em breve');
+  });
+
+  it('calendário mostra "Todos" + uma aba por mês, só com o nome do mês (sem local/formato)', () => {
+    const lista = Object.keys(CONGRESSOS).map((slug) => toColumnShape(slug));
+    const html = congressosPageHtml(lista);
+    const tabs = [...html.matchAll(/<button type="button" data-mes-filtro="([^"]+)"[^>]*>([^<]+)<\/button>/g)];
+
+    expect(tabs.map((m) => m[1])).toEqual(['todos', 'agosto', 'setembro', 'outubro', 'novembro']);
+    expect(tabs.map((m) => m[2])).toEqual(['Todos', 'Agosto', 'Setembro', 'Outubro', 'Novembro']);
+    for (const [, , label] of tabs) {
+      expect(label).not.toMatch(/Brasília|Rio de Janeiro|Belo Horizonte|Online|Presencial/i);
+    }
+  });
+
+  it('"Todos" começa ativo e todos os cards vêm visíveis; meses ficam disponíveis pra filtrar a partir daí', () => {
+    const lista = Object.keys(CONGRESSOS).map((slug) => toColumnShape(slug));
+    const html = congressosPageHtml(lista);
+
+    expect(html).toMatch(/data-mes-filtro="todos" class="cong-mes-tab cong-mes-ativo"/);
+    expect(html).not.toMatch(/data-mes-filtro="agosto" class="cong-mes-tab cong-mes-ativo"/);
+
+    for (const mes of ['agosto', 'setembro', 'outubro', 'novembro']) {
+      const card = html.match(new RegExp(`data-mes="${mes}" style="[^"]*display:(grid|none)`));
+      expect(card[1]).toBe('grid');
+    }
   });
 });

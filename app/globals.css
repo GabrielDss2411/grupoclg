@@ -15,3 +15,6 @@ button, input, textarea { font-family: inherit; }
 
 /* Estado ativo da navbar (aplicado por rota) */
 .nav-active { background: rgba(233,198,90,0.16) !important; color: #ffffff !important; }
+
+/* Aba de mês ativa no calendário de congressos (/congressos) */
+.cong-mes-ativo { background: linear-gradient(120deg,#E9C65A,#C9A227) !important; color: #0A1442 !important; border-color: transparent !important; }

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Screen from '@/components/Screen';
+import DetalheComFicha from '@/components/DetalheComFicha';
 import { getCursos, getCurso, seguroNoBuild } from '@/lib/db';
 import { cursoHtml } from '@/lib/cursos-data';
 
@@ -21,5 +21,5 @@ export default async function CursoPage({ params }) {
   const { slug } = await params;
   const curso = await getCurso(slug);
   if (!curso) notFound();
-  return <Screen html={cursoHtml(curso)} />;
+  return <DetalheComFicha html={cursoHtml(curso)} tipo="curso" item={{ id: curso.id, titulo: curso.title }} />;
 }

@@ -2,15 +2,19 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export const ROUTES = { home: '/', cursos: '/cursos', congressos: '/congressos', incompany: '/in-company', sobre: '/sobre' };
+export const ROUTES = { home: '/', cursos: '/cursos', congressos: '/congressos', incompany: '/in-company', artigos: '/artigos', sobre: '/sobre' };
 
 /**
  * Delegação de eventos para o conteúdo migrado (renderizado via HTML):
+ * - [data-ficha] => abre o modal da ficha de inscrição (callback onFicha)
+ * - [data-mes-filtro] => calendário de congressos: mostra só os cards com o
+ *   [data-mes] correspondente (valor especial 'todos' mostra tudo) e marca a
+ *   aba clicada como ativa (classe .cong-mes-ativo, app/globals.css)
  * - [data-href] => navegação para caminho literal (páginas de detalhe)
  * - [data-nav] => navegação por rota nomeada (Next router)
  * - [data-slide] (com sliders:true) => rolagem dos carrosséis
  */
-export function useSiteHandlers(ref, { sliders = false } = {}) {
+export function useSiteHandlers(ref, { sliders = false, onFicha } = {}) {
   const router = useRouter();
   useEffect(() => {
     const root = ref.current;
@@ -18,6 +22,23 @@ export function useSiteHandlers(ref, { sliders = false } = {}) {
     const onClick = (e) => {
       const t = e.target;
       if (!t || !t.closest) return;
+      const ficha = t.closest('[data-ficha]');
+      if (ficha) {
+        e.preventDefault();
+        if (onFicha) onFicha();
+        return;
+      }
+      const mesBtn = t.closest('[data-mes-filtro]');
+      if (mesBtn) {
+        e.preventDefault();
+        const mes = mesBtn.getAttribute('data-mes-filtro');
+        root.querySelectorAll('[data-mes-filtro]').forEach((b) => b.classList.remove('cong-mes-ativo'));
+        mesBtn.classList.add('cong-mes-ativo');
+        root.querySelectorAll('[data-mes]').forEach((card) => {
+          card.style.display = mes === 'todos' || card.getAttribute('data-mes') === mes ? 'grid' : 'none';
+        });
+        return;
+      }
       const link = t.closest('[data-href]');
       if (link) {
         e.preventDefault();
@@ -44,5 +65,5 @@ export function useSiteHandlers(ref, { sliders = false } = {}) {
     };
     root.addEventListener('click', onClick);
     return () => root.removeEventListener('click', onClick);
-  }, [ref, router, sliders]);
+  }, [ref, router, sliders, onFicha]);
 }

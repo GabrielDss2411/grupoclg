@@ -13,7 +13,7 @@ vi.mock('next/cache', () => ({
 }));
 
 const { revalidateTag, revalidatePath } = await import('next/cache');
-const { salvarCurso, salvarCongresso, alternarDisponivel } = await import('../app/admin/actions.js');
+const { salvarCurso, salvarCongresso, salvarArtigo, alternarDisponivel } = await import('../app/admin/actions.js');
 
 // Fake de client Supabase: cobre só as chamadas que as actions realmente
 // fazem (auth.getUser, from().select().eq().maybeSingle() para checagem de
@@ -105,6 +105,22 @@ function congressoFormData(overrides = {}) {
     local_chip: 'Rio de Janeiro/RJ',
     formato: 'Presencial',
     card_desc: 'Descrição do card de teste.',
+    ...overrides,
+  };
+  for (const [k, v] of Object.entries(fields)) {
+    if (v !== undefined && v !== null) fd.set(k, v);
+  }
+  return fd;
+}
+
+function artigoFormData(overrides = {}) {
+  const fd = new FormData();
+  const fields = {
+    titulo: 'Artigo de Teste',
+    categoria: 'Licitações',
+    resumo: 'Resumo do artigo de teste.',
+    capa: '/assets/advogados.jpg',
+    conteudo: 'Corpo do artigo de teste.',
     ...overrides,
   };
   for (const [k, v] of Object.entries(fields)) {
@@ -464,5 +480,101 @@ describe('app/admin/actions.js -- idempotência do duplo clique (AC P1-B/8)', ()
     expect(calls.update[1].id).toBe('id-2');
     expect(calls.update[0].payload).not.toHaveProperty('slug');
     expect(calls.update[1].payload).not.toHaveProperty('slug');
+  });
+});
+
+describe('app/admin/actions.js -- salvarArtigo (mesmas regras de curso/congresso)', () => {
+  it('sem sessão retorna erro de auth e NÃO toca o banco', async () => {
+    const { supabase, calls } = makeSupabaseMock({ user: null });
+    state.supabase = supabase;
+
+    const result = await salvarArtigo(artigoFormData());
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toMatch(/sess[aã]o/i);
+    expect(calls.insert.length).toBe(0);
+  });
+
+  it('artigo sem título retorna erro com o campo faltante e não persiste', async () => {
+    const { supabase, calls } = makeSupabaseMock();
+    state.supabase = supabase;
+
+    const result = await salvarArtigo(artigoFormData({ titulo: '' }));
+
+    expect(result.ok).toBe(false);
+    expect(result.fields).toContain('titulo');
+    expect(calls.insert.length).toBe(0);
+  });
+
+  it('artigo sem conteúdo retorna erro com o campo faltante e não persiste', async () => {
+    const { supabase, calls } = makeSupabaseMock();
+    state.supabase = supabase;
+
+    const result = await salvarArtigo(artigoFormData({ conteudo: '' }));
+
+    expect(result.ok).toBe(false);
+    expect(result.fields).toContain('conteudo');
+    expect(calls.insert.length).toBe(0);
+  });
+
+  it('criação com sucesso persiste via insert (slug gerado do título) e revalida a tag "artigos" e os paths de detalhe/lista', async () => {
+    const { supabase, calls } = makeSupabaseMock({
+      insertResult: { data: { id: 'id-1', slug: 'artigo-de-teste' }, error: null },
+    });
+    state.supabase = supabase;
+
+    const result = await salvarArtigo(artigoFormData());
+
+    expect(result.ok).toBe(true);
+    expect(calls.insert[0].payload.slug).toBe('artigo-de-teste');
+    expect(calls.insert[0].payload.titulo).toBe('Artigo de Teste');
+    expect(calls.insert[0].payload.autor).toBe('Bruno Verzani'); // default quando não enviado
+    expect(revalidateTag).toHaveBeenCalledWith('artigos');
+    expect(revalidatePath).toHaveBeenCalledWith('/artigos/artigo-de-teste');
+    expect(revalidatePath).toHaveBeenCalledWith('/artigos');
+  });
+
+  it('edição (com id) preserva o slug -- UPDATE real, não recalcula nem reenvia', async () => {
+    const { supabase, calls } = makeSupabaseMock({
+      updateResult: { data: { id: 'id-existente', slug: 'slug-original' }, error: null },
+    });
+    state.supabase = supabase;
+
+    const result = await salvarArtigo(artigoFormData({ id: 'id-existente', titulo: 'Título Editado' }));
+
+    expect(result.ok).toBe(true);
+    expect(calls.eqSlug.length).toBe(0);
+    expect(calls.insert.length).toBe(0);
+    expect(calls.update[0].id).toBe('id-existente');
+    expect(calls.update[0].payload).not.toHaveProperty('slug');
+  });
+
+  it('falha do mock no insert retorna { ok:false } sem lançar', async () => {
+    const { supabase } = makeSupabaseMock({
+      insertResult: { data: null, error: new Error('conexão recusada') },
+    });
+    state.supabase = supabase;
+
+    await expect(salvarArtigo(artigoFormData())).resolves.toEqual(
+      expect.objectContaining({ ok: false })
+    );
+  });
+});
+
+describe('app/admin/actions.js -- alternarDisponivel(artigos)', () => {
+  it('persiste o novo valor da flag e revalida tag/paths (sem tocar a home)', async () => {
+    const { supabase, calls } = makeSupabaseMock({
+      updateResult: { data: { id: 'id-1', slug: 'artigo-de-teste' }, error: null },
+    });
+    state.supabase = supabase;
+
+    const result = await alternarDisponivel('artigos', 'id-1', false);
+
+    expect(result.ok).toBe(true);
+    expect(calls.update[0].payload).toEqual({ disponivel: false });
+    expect(revalidateTag).toHaveBeenCalledWith('artigos');
+    expect(revalidatePath).toHaveBeenCalledWith('/artigos');
+    expect(revalidatePath).toHaveBeenCalledWith('/artigos/artigo-de-teste');
+    expect(revalidatePath).not.toHaveBeenCalledWith('/');
   });
 });
